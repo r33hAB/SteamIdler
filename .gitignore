@@ -1,0 +1,12 @@
+# Build output
+bin/
+dist/
+*.exe
+*.pdb
+
+# Valve's redistributable - sourced from the local Steam install, never committed
+*.dll
+
+# Runtime state
+SteamIdler.cfg
+SteamIdler.error.log
