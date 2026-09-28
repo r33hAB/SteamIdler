@@ -29,8 +29,24 @@ games="$(printf '%s' "$GAMES" | tr -d ' ' | sed 's/,,*/,/g; s/^,//; s/,$//')"
 case "$games" in
     '' | *[!0-9,]*) fail "GAMES must be AppIDs separated by commas, got: $GAMES" ;;
 esac
+
+# What friends see you playing. Steam shows the first game in the list, so an
+# AppID moves (or adds) that game to the front; any other text is shown as a
+# non-Steam game, which takes one of the 32 slots. Steam treats both as a hint.
+display="${DISPLAY_GAME:-}"
+custom=""
+limit=32
+case "$display" in
+    '') ;;
+    *[!0-9]*) custom="$display"; limit=31 ;;
+    *)
+        rest="$(printf '%s' "$games" | tr ',' '\n' | grep -vx "$display" | paste -sd, -)"
+        games="$display${rest:+,$rest}"
+        ;;
+esac
+
 count="$(printf '%s' "$games" | tr ',' '\n' | grep -c .)"
-[ "$count" -le 32 ] || fail "Steam plays at most 32 games at once, GAMES has $count"
+[ "$count" -le "$limit" ] || fail "Steam plays at most $limit games at once here, GAMES has $count"
 
 # Card farming would play other games (the ones with drops left) before these.
 # Paused by default, so only GAMES get playtime; ASF then plays GAMES as soon as it logs in.
@@ -41,7 +57,14 @@ case "${FARM_CARDS:-false}" in
 esac
 
 # Offline still accrues playtime; it just doesn't show you as online around the clock.
-case "${ONLINE_STATUS:-offline}" in
+# With DISPLAY_GAME set the default is online, since offline shows nobody anything.
+default_status=offline
+[ -z "$display" ] || default_status=online
+online_status="${ONLINE_STATUS:-$default_status}"
+case "$display:$online_status" in
+    ?*:offline | ?*:invisible) echo "steamidler: DISPLAY_GAME is set, but nobody sees it while ONLINE_STATUS is $online_status" >&2 ;;
+esac
+case "$online_status" in
     offline) status=0 ;;
     online) status=1 ;;
     busy) status=2 ;;
@@ -82,19 +105,31 @@ if [ -n "${STEAM_PASSWORD:-}" ]; then
   \"SteamPassword\": $(json_string "$STEAM_PASSWORD"),"
 fi
 
+shown=""
+if [ -n "$custom" ]; then
+    shown="
+  \"CustomGamePlayedWhileIdle\": $(json_string "$custom"),"
+fi
+
 # RemoteCommunication 0: by default ASF joins its own Steam group with every
 # account it logs in, which nobody wants on a main account.
 cat > "$config/$bot.json" <<EOF
 {
   "Enabled": true,
   "SteamLogin": $(json_string "$STEAM_LOGIN"),$password
-  "GamesPlayedWhileIdle": [$games],
+  "GamesPlayedWhileIdle": [$games],$shown
   "FarmingPreferences": $farming,
   "OnlineStatus": $status,
   "RemoteCommunication": 0
 }
 EOF
 
-echo "steamidler: bot '$bot' idles $count game(s): $games (card farming $([ "$farming" = 0 ] && echo on || echo off)), web UI on port $port"
+if [ "$farming" = 0 ]; then
+    mode="ASF farms trading cards first, then idles these"
+else
+    mode="ASF's card farming is paused on purpose, so only these get playtime"
+fi
+echo "steamidler: bot '$bot' idles $count game(s): $games ($mode), web UI on port $port"
+[ -z "$display" ] || echo "steamidler: showing friends '$display' as the game being played (status $online_status)"
 
 exec ArchiSteamFarm --no-restart "$@"

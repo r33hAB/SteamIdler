@@ -5,6 +5,8 @@ Notable changes, newest first. The format follows [Keep a Changelog](https://kee
 ## [Unreleased]
 ### 2026-09-28
 #### Added
+- `server/`: `DISPLAY_GAME` picks what friends see you playing, either an AppID (moved to the front, since Steam shows the first game) or custom text shown as a non-Steam game; status defaults to online when it is set.
+- `server/`: the startup log line explains that ASF's card farming is paused on purpose, and the guide lists which "farming" messages are normal.
 - `server/`: headless 24/7 idling on Railway or any Docker host. Wraps ArchiSteamFarm, writes its config from environment variables, pauses card farming so only the chosen games get playtime, and keeps ASF out of its Steam group.
 
 ## [1.1.0] - 2026-09-28

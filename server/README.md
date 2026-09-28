@@ -35,9 +35,18 @@ writes ASF's config from environment variables on every start, then hands over t
    ```
    For an account that gets Steam Guard codes by email, use
    `input idler SteamGuard <code from the email>` instead of the second line.
-8. Check the log for a line starting `Playing selected`, listing your games. `status idler`
-   answers "Bot is paused or running in manual mode.", which is right: card farming is paused
-   so that only `GAMES` get playtime.
+8. Check the log for a line starting `Playing selected`, listing your games. That line is the
+   proof it works.
+
+   ASF talks about "farming" everywhere, because its main feature is farming trading cards.
+   That feature is paused on purpose so that only `GAMES` get playtime, which makes these
+   messages normal:
+   - `status idler` answers "Bot is paused or running in manual mode."
+   - The web UI shows the bot as paused, or as not farming anything.
+
+   One message means something else is holding the play session: "Account is currently being
+   used: ASF will resume farming when it's free...". Steam lets one session play at a time, so
+   quit any game or desktop idler on your other devices and ASF carries on by itself.
 9. Optional: remove the domain again under **Settings → Networking**. Idling carries on;
    generate a domain again whenever you need the web UI.
 
@@ -50,11 +59,26 @@ writes ASF's config from environment variables on every start, then hands over t
 | `IPC_PASSWORD` | required | password for the web UI and the API |
 | `STEAM_PASSWORD` | unset | lets ASF sign in again by itself if Steam ever drops the saved token; without it, repeat step 7 when that happens |
 | `FARM_CARDS` | `false` | `true` lets ASF farm trading cards first, which plays whichever games still have drops and `GAMES` only after that |
-| `ONLINE_STATUS` | `offline` | `offline`, `online`, `busy`, `away` or `invisible`; playtime accrues either way |
+| `DISPLAY_GAME` | unset | what friends see you playing: an AppID (moved to the front of `GAMES`, or added to it) or any text, shown as a non-Steam game; see below |
+| `ONLINE_STATUS` | `offline`, or `online` with `DISPLAY_GAME` | `offline`, `online`, `busy`, `away` or `invisible`; playtime accrues either way |
 | `BOT_NAME` | `idler` | the name used in commands |
 
 The variables are the source of truth. Changing one redeploys the service, and edits made in
 the web UI's config editor are overwritten on the next start.
+
+### Choosing the game friends see
+
+When several games play at once, Steam shows one of them as your current game: the first in
+the list. `DISPLAY_GAME` picks it.
+
+- **An AppID**, e.g. `2868840`: that game moves to the front of `GAMES`. If it isn't in
+  `GAMES` yet it is added, so it gets playtime too and you must own it.
+- **Any other text**, e.g. `Touching grass`: shown as "Playing non-Steam game: Touching grass".
+  It takes one of Steam's 32 slots, so `GAMES` can then hold at most 31.
+
+Friends only see it while your status is visible, so `ONLINE_STATUS` defaults to `online` when
+`DISPLAY_GAME` is set. Steam treats both kinds as a hint and may occasionally show another of
+your games.
 
 ## Things to know
 
