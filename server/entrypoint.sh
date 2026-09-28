@@ -49,10 +49,12 @@ count="$(printf '%s' "$games" | tr ',' '\n' | grep -c .)"
 [ "$count" -le "$limit" ] || fail "Steam plays at most $limit games at once here, GAMES has $count"
 
 # Card farming would play other games (the ones with drops left) before these.
-# Paused by default, so only GAMES get playtime; ASF then plays GAMES as soon as it logs in.
+# Off: 9 = FarmingPausedByDefault (ASF plays GAMES as soon as it logs in) plus
+# FarmPriorityQueueOnly with an empty queue, so pressing Resume in the web UI
+# finds nothing to farm and falls straight back to GAMES.
 case "${FARM_CARDS:-false}" in
     true | 1 | yes) farming=0 ;;
-    false | 0 | no) farming=1 ;;
+    false | 0 | no) farming=9 ;;
     *) fail "FARM_CARDS must be true or false" ;;
 esac
 

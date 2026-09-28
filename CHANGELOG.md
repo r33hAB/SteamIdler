@@ -4,6 +4,8 @@ Notable changes, newest first. The format follows [Keep a Changelog](https://kee
 
 ## [Unreleased]
 ### 2026-09-28
+#### Fixed
+- `server/`: pressing Resume in ASF's web UI started card farming (e.g. Phasmophobia) instead of the chosen games. Farming is now also limited to ASF's empty priority queue, so a resume finds nothing and falls back to `GAMES`.
 #### Added
 - `server/`: `DISPLAY_GAME` picks what friends see you playing, either an AppID (moved to the front, since Steam shows the first game) or custom text shown as a non-Steam game; status defaults to online when it is set.
 - `server/`: the startup log line explains that ASF's card farming is paused on purpose, and the guide lists which "farming" messages are normal.

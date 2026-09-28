@@ -35,6 +35,10 @@ writes ASF's config from environment variables on every start, then hands over t
    ```
    For an account that gets Steam Guard codes by email, use
    `input idler SteamGuard <code from the email>` instead of the second line.
+
+   `start idler` is only needed this once, to log in. After that the bot starts by itself on
+   every deploy. The web UI's Start, Pause and Resume buttons are about ASF's card farming, so
+   you never need them.
 8. Check the log for a line starting `Playing selected`, listing your games. That line is the
    proof it works.
 
@@ -43,6 +47,8 @@ writes ASF's config from environment variables on every start, then hands over t
    messages normal:
    - `status idler` answers "Bot is paused or running in manual mode."
    - The web UI shows the bot as paused, or as not farming anything.
+   - Pressing Resume (or `resume idler`) is harmless. Only games in ASF's priority queue may be
+     farmed, and that queue is empty, so ASF finds nothing to farm and goes back to `GAMES`.
 
    One message means something else is holding the play session: "Account is currently being
    used: ASF will resume farming when it's free...". Steam lets one session play at a time, so
@@ -58,7 +64,7 @@ writes ASF's config from environment variables on every start, then hands over t
 | `GAMES` | required | AppIDs to idle, comma-separated, at most 32 |
 | `IPC_PASSWORD` | required | password for the web UI and the API |
 | `STEAM_PASSWORD` | unset | lets ASF sign in again by itself if Steam ever drops the saved token; without it, repeat step 7 when that happens |
-| `FARM_CARDS` | `false` | `true` lets ASF farm trading cards first, which plays whichever games still have drops and `GAMES` only after that |
+| `FARM_CARDS` | `false` | `true` lets ASF farm trading cards first, which plays whichever games still have drops (and shows those to friends) and `GAMES` only after that |
 | `DISPLAY_GAME` | unset | what friends see you playing: an AppID (moved to the front of `GAMES`, or added to it) or any text, shown as a non-Steam game; see below |
 | `ONLINE_STATUS` | `offline`, or `online` with `DISPLAY_GAME` | `offline`, `online`, `busy`, `away` or `invisible`; playtime accrues either way |
 | `BOT_NAME` | `idler` | the name used in commands |
