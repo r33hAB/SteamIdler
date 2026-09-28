@@ -1,0 +1,7 @@
+# In the service settings, set Root Directory to /server and the config file
+# path to /server/railway.toml (Railway resolves this file from the repo root).
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+restartPolicyType = "ALWAYS"

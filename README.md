@@ -55,6 +55,12 @@ but haven't installed can be added with **Add AppID...**. The AppID is the numbe
 store URL (`store.steampowered.com/app/440/` → `440`). On a Mac this is also how you idle
 games that have no Mac version, and the dialog accepts the whole store URL.
 
+### On a server, 24/7
+
+The desktop apps need Steam running on the same machine. To idle around the clock on a
+headless host such as Railway, use [`server/`](server/README.md) instead. It runs
+ArchiSteamFarm in Docker, configured from environment variables, in about 60 MB of memory.
+
 ## How it works
 
 Steam credits playtime to any process that has initialised the Steam API under a given
@@ -143,6 +149,7 @@ to one from an installed Mac game.
 | `macos/Worker/main.swift` | macOS worker, one instance per idling game |
 | `macos/make-icon.swift` | draws the app icon at build time, so no binary asset is committed |
 | `build.sh` | builds a universal `Steam Idler.app` with the Swift compiler and installs it |
+| `server/` | headless 24/7 setup: ArchiSteamFarm in Docker, configured from environment variables, ready for Railway |
 
 Generated at build or run time, and deliberately not committed: `bin/`, `steam_api64.dll`,
 `SteamIdler.cfg`, `SteamIdler.error.log`.

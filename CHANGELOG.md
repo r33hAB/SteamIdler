@@ -2,6 +2,11 @@
 
 Notable changes, newest first. The format follows [Keep a Changelog](https://keepachangelog.com).
 
+## [Unreleased]
+### 2026-09-28
+#### Added
+- `server/`: headless 24/7 idling on Railway or any Docker host. Wraps ArchiSteamFarm, writes its config from environment variables, pauses card farming so only the chosen games get playtime, and keeps ASF out of its Steam group.
+
 ## [1.1.0] - 2026-09-28
 ### Added
 - macOS port: native Swift app (`macos/`, `build.sh`) with the same one-worker-per-game design, Dock badge instead of a tray icon, universal arm64 + x86_64 build.
